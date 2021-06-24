@@ -76,6 +76,39 @@ function mpesa_wp_init() {
 		 * Plugin Class constructor
 		 */
 		public function __construct() {
+			$this->id = 'mpesa-wp-plugin';
+			$this->icon = apply_filters(
+				'mpesa_wp_icon',
+				plugins_url('public/images/mpesa-logo.png', __FILE__)
+			);
+			$this->has_fields = false;
+			$this->method_title = __('Mpesa WordPress Plugin', 'mpesa-wp-plugin');
+			$this->method_description = __('Accept Mpesa payments for your store', 'mpesa-wp-plugin');
+
+			$this->supports = array(
+				'products'
+			);
+
+			// Load settings
+			$this->init_form_fields();
+
+			$this->init_settings();
+
+			$this->title = $this->get_option('title');
+			$this->description = $this->get_option('description');
+			$this->api_key = $this->get_option('api_key');
+			$this->public_key = $this->get_option('public_key');
+			$this->service_provider = $this->get_option('service_provider');
+			$this->test = $this->get_option('test');
+			$this->enabled = $this->get_option('enabled');
+
+			// Save the settings
+			add_action(
+				'woocommerce_update_options_payment_gateways_' . $this->id,
+				array($this, 'process_admin_options')
+			);
+
+			add_action('wp_enqueue_scripts', array($this, 'payment_scripts'));
 		}
 
 		/**
