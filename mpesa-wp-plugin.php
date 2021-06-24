@@ -99,7 +99,7 @@ function mpesa_wp_init() {
 			$this->api_key = $this->get_option('api_key');
 			$this->public_key = $this->get_option('public_key');
 			$this->service_provider = $this->get_option('service_provider');
-			$this->test = 'yes' === $this->get_option('test');
+			$this->test = $this->get_option('test');
 			$this->enabled = $this->get_option('enabled');
 
 			// Save the settings
@@ -164,12 +164,115 @@ function mpesa_wp_init() {
 		 * Custom CSS and JS
 		 */
 		public function payment_scripts() {
+			if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order'])) {
+				return;
+			}
+
+			if ('no' == $this->enabled) {
+				return;
+			}
+
+			if (empty($this->api_key) || empty($this->public_key)) {
+				return;
+			}
+
+			wp_enqueue_script(
+				'payment',
+				plugin_dir_url(__FILE__) . '/public/js/main.js',
+				array(),
+				false,
+				true
+			);
 		}
 
 		/*
-				* Fields validation
+				*  Payment fields
 			 */
+
+		public function payment_fields() {
+			if ($this->description) {
+				if ('yes' == $this->test) {
+					$this->description .= __(
+						'<br />
+						<strong>TEST MODE ENABLED</strong>',
+						'mpesa-wp-plugin'
+					);
+					$this->description  = trim($this->description);
+				}
+
+				echo wpautop(wp_kses_post($this->description));
+			}
+
+			if (isset($_SESSION['wc_mpesa_number'])) {
+				$number = $this->wc_mpesa_validate_number($_SESSION['wc_mpesa_number']);
+			} else {
+				$number = '';
+			}
+
+			echo '
+			<fieldset
+				id="wc-' . esc_attr($this->id) . '-cc-form"
+				class="wc-credit-card-form wc-payment-form"
+				style="background:transparent;"
+			>';
+
+			echo '
+				<div class="form-row form-row-wide">
+					<label>'
+				. esc_html__('Mpesa Number', 'mpesa-wp-plugin') .
+				'<span class="required"> * </span>
+					</label>
+					<input
+						id="wc_mpesa_number"
+						type="tel"
+						autocomplete="off"
+						value="' . esc_attr($number) . '"
+						placeholder="' . esc_attr__('ex: 84 123 4567', 'mpesa-wp-plugin') . '"
+					>
+				</div>
+				<div class="clear"></div>';
+
+			echo '<div class="clear"></div></fieldset>';
+		}
+
 		public function validate_fields() {
+			//validate currency
+			if ('MZN' != get_woocommerce_currency()) {
+				wc_add_notice(
+					__('Currency not supported!', 'mpesa-wp-plugin'),
+					'error'
+				);
+				return false;
+			}
+			//validate  phone
+			$number = $this->wc_mpesa_validate_number($_POST['wc_mpesa_number']);
+			if (!$number) {
+				wc_add_notice(
+					__('Phone number is required!', 'mpesa-wp-plugin'),
+					'error'
+				);
+				return false;
+			}
+
+			//save phone to use on payment screen and new transactions
+			session_start();
+			$_SESSION['wc_mpesa_number'] = $number;
+
+			return true;
+		}
+
+		public function wc_mpesa_validate_number($number) {
+			$number = filter_var($number, FILTER_VALIDATE_INT);
+			//validade mpesa numbers to only accept 84 and 85 prefix ex: 84 8283607
+			if (
+				!isset($number) ||
+				strlen($number) != 9 ||
+				!preg_match('/^8[4|5][0-9]{7}$/', $number)
+			) {
+				wc_add_notice(__('Phone number is incorrect!', 'mpesa-wp-plugin'), 'error');
+				return false;
+			}
+			return $number;
 		}
 
 		/*
