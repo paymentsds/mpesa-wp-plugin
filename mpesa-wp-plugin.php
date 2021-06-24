@@ -99,7 +99,7 @@ function mpesa_wp_init() {
 			$this->api_key = $this->get_option('api_key');
 			$this->public_key = $this->get_option('public_key');
 			$this->service_provider = $this->get_option('service_provider');
-			$this->test = $this->get_option('test');
+			$this->test = 'yes' === $this->get_option('test');
 			$this->enabled = $this->get_option('enabled');
 
 			// Save the settings
@@ -112,9 +112,52 @@ function mpesa_wp_init() {
 		}
 
 		/**
-		 * Plugin options, we deal with it in Step 3 too
+		 * Plugin options
 		 */
 		public function init_form_fields() {
+			$this->form_fields = array(
+				'enabled' => array(
+					'title'       => __('Enable/Disable', 'mpesa-wp-plugin'),
+					'label'       => __('Enable Mpesa Wordpress plugin', 'mpesa-wp-plugin'),
+					'type'        => 'checkbox',
+					'description' => '',
+					'default'     => 'no'
+				),
+				'title' => array(
+					'title' => __('Title', 'mpesa-wp-plugin'),
+					'type' => 'text',
+					'description' => __('This controls the title which the user sees during checkout', 'mpesa-wp-plugin'),
+					'default' => __('Mpesa', 'mpesa-wp-plugin'),
+					'desc_tip'      => true,
+				),
+				'description' => array(
+					'title' => __('Customer Message', 'mpesa-wp-plugin'),
+					'type' => 'textarea',
+					'default' => __('Pay via mpesa', 'mpesa-wp-plugin')
+				),
+				'api_key' => array(
+					'title' => __('API Key', 'mpesa-wp-plugin'),
+					'type' => 'password',
+					'default' => __('', 'mpesa-wp-plugin')
+				),
+				'public_key' => array(
+					'title' => __('Public Key', 'mpesa-wp-plugin'),
+					'type' => 'textarea',
+					'default' => __('', 'mpesa-wp-plugin')
+				),
+				'service_provider' => array(
+					'title' => __('Service Provider Code', 'mpesa-wp-plugin'),
+					'type' => 'text',
+					'description' => __('Use 171717 for testing', 'mpesa-wp-plugin'),
+					'default' => '171717'
+				),
+				'test' => array(
+					'title' => __('Test Mode', 'mpesa-wp-plugin'),
+					'type' => 'checkbox',
+					'label' => __('Enable Test Environment', 'mpesa-wp-plugin'),
+					'default' => 'yes',
+				),
+			);
 		}
 
 		/*
