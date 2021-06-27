@@ -1,0 +1,7 @@
+languages/mpesa-wp-plugin-backup-*
+languages/mpesa-wp-plugin-pt_PT-backup-*
+languages/mpesa-wp-plugin-pt_BR-backup-*
+vendor
+.cache
+.vscode
+!/.gitignore

@@ -24,6 +24,8 @@ if (!defined('WPINC')) {
 	wp_die();
 }
 
+use Paymentsds\MPesa\Client;
+
 
 if (!defined('MPESA_WP_PLUGIN_VERSION')) {
 	define('MPESA_WP_PLUGIN_VERSION', '0.1.0');
@@ -60,6 +62,8 @@ function mpesa_wp_add_gateway_class($gateways) {
 }
 
 function mpesa_wp_init() {
+	require 'vendor/autoload.php';
+
 	if (!class_exists('WC_Payment_Gateway')) {
 		return;
 	}
@@ -108,7 +112,7 @@ function mpesa_wp_init() {
 				array($this, 'process_admin_options')
 			);
 
-			add_action('wp_enqueue_scripts', array($this, 'payment_scripts'));
+			//add_action('wp_enqueue_scripts', array($this, 'payment_scripts'));
 		}
 
 		/**
@@ -190,6 +194,7 @@ function mpesa_wp_init() {
 			 */
 
 		public function payment_fields() {
+			session_start();
 			if ($this->description) {
 				if ('yes' == $this->test) {
 					$this->description .= __(
@@ -226,7 +231,6 @@ function mpesa_wp_init() {
 						id="wc_mpesa_number"
 						type="tel"
 						autocomplete="off"
-						value="' . esc_attr($number) . '"
 						placeholder="' . esc_attr__('ex: 84 123 4567', 'mpesa-wp-plugin') . '"
 					>
 				</div>
@@ -236,6 +240,7 @@ function mpesa_wp_init() {
 		}
 
 		public function validate_fields() {
+			session_start();
 			//validate currency
 			if ('MZN' != get_woocommerce_currency()) {
 				wc_add_notice(
@@ -245,7 +250,8 @@ function mpesa_wp_init() {
 				return false;
 			}
 			//validate  phone
-			$number = $this->wc_mpesa_validate_number($_POST['wc_mpesa_number']);
+			$number = $this->wc_mpesa_validate_number($_SESSION['wc_mpesa_number']);
+
 			if (!$number) {
 				wc_add_notice(
 					__('Phone number is required!', 'mpesa-wp-plugin'),
@@ -255,7 +261,6 @@ function mpesa_wp_init() {
 			}
 
 			//save phone to use on payment screen and new transactions
-			session_start();
 			$_SESSION['wc_mpesa_number'] = $number;
 
 			return true;
@@ -269,6 +274,7 @@ function mpesa_wp_init() {
 				strlen($number) != 9 ||
 				!preg_match('/^8[4|5][0-9]{7}$/', $number)
 			) {
+
 				wc_add_notice(__('Phone number is incorrect!', 'mpesa-wp-plugin'), 'error');
 				return false;
 			}
@@ -279,6 +285,78 @@ function mpesa_wp_init() {
 			 * We're processing the payments here
 			 */
 		public function process_payment($order_id) {
+			session_start();
+			$order = new WC_Order($order_id);
+
+			if (isset($_SESSION['wc_mpesa_number'])) {
+				$number = $this->wc_mpesa_validate_number($_SESSION['wc_mpesa_number']);
+			} else {
+				$number = false;
+			}
+
+			if ($order_id && $number != false) {
+				$amount = $order->get_total();
+				$reference_id = $this->generate_reference_id($order_id);
+				$number = "258${number}";
+
+				$result = $this -> make_payment($number, $reference_id, $order_id, $amount);
+
+				if ($result) {
+					// Mark as paid
+					$order->payment_complete();
+					// Reduce stock levels
+					$order->reduce_order_stock();
+
+					// some notes to customer (replace true with false to make it private)
+					$order->add_order_note(
+						__('Your order is paid! Thank you!', 'mpesa-wp-plugin'),
+						true
+					);
+					WC()->cart->empty_cart();
+
+					return array(
+						'result' => 'success',
+						'redirect' => $this->get_return_url($order)
+					);
+				} else {
+					wc_add_notice(
+						__('Please try again. RESULT: ' . $result->data['code'], 'mpesa-wp-plugin'),
+						'error'
+					);
+					return;
+				}
+			}
+		}
+
+		public function make_payment($number, $reference_id, $order_id, $amount) {
+			$client = new Client([
+				'apiKey' => $this->api_key,
+				'publicKey' => $this->public_key,
+				'serviceProviderCode' => $this->service_provider,
+				'verifySSL' => false,
+				'Origin' => "developer.mpesa.vm.co.mz"
+			]);
+
+			$paymentData = [
+				'from' => $number,
+				'reference' => $reference_id,
+				'transaction' => $order_id,
+				'amount' => $amount
+			];
+
+				$result = $client->receive($paymentData);
+
+				if($result->success) {
+					return true;
+				} else {
+					return false;
+				}
+
+		}
+
+		function generate_reference_id($order_id) {
+			//generate uniq reference_id
+			return substr($order_id . bin2hex(random_bytes(5)), 0, 10);
 		}
 
 		/*
