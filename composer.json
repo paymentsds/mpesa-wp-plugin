@@ -1,5 +1,6 @@
 {
     "require": {
-        "paymentsds/mpesa": "0.1.0-alpha11"
+        "paymentsds/mpesa": "0.1.0-alpha11",
+        "guzzlehttp/guzzle": "7.0"
     }
 }

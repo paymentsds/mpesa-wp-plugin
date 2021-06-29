@@ -24,7 +24,8 @@ if (!defined('WPINC')) {
 	wp_die();
 }
 
-use Paymentsds\MPesa\Client;
+//use Paymentsds\MPesa\Client;
+use GuzzleHttp\Client;
 
 
 if (!defined('MPESA_WP_PLUGIN_VERSION')) {
@@ -229,6 +230,8 @@ function mpesa_wp_init() {
 					</label>
 					<input
 						id="wc_mpesa_number"
+						name="wc_mpesa_number"
+						class="wc_mpesa_number"
 						type="tel"
 						autocomplete="off"
 						placeholder="' . esc_attr__('ex: 84 123 4567', 'mpesa-wp-plugin') . '"
@@ -250,7 +253,7 @@ function mpesa_wp_init() {
 				return false;
 			}
 			//validate  phone
-			$number = $this->wc_mpesa_validate_number($_SESSION['wc_mpesa_number']);
+			$number = $this->wc_mpesa_validate_number($_POST['wc_mpesa_number']);
 
 			if (!$number) {
 				wc_add_notice(
@@ -296,12 +299,12 @@ function mpesa_wp_init() {
 
 			if ($order_id && $number != false) {
 				$amount = $order->get_total();
-				$reference_id = $this->generate_reference_id($order_id);
+				$reference = $this->generate_reference_id($order_id);
 				$number = "258${number}";
 
-				$result = $this -> make_payment($number, $reference_id, $order_id, $amount);
+				$result = $this->mpesa_wp_execute_transaction($number, $reference, $order_id, $amount);
 
-				if ($result) {
+				if ($result->output_ResponseCode == 'INS-0') {
 					// Mark as paid
 					$order->payment_complete();
 					// Reduce stock levels
@@ -328,30 +331,52 @@ function mpesa_wp_init() {
 			}
 		}
 
-		public function make_payment($number, $reference_id, $order_id, $amount) {
+		public function mpesa_wp_execute_transaction($number, $reference, $transaction, $amount) {
+
+			$token = $this->mpesa_wp_generate_token();
+
 			$client = new Client([
-				'apiKey' => $this->api_key,
-				'publicKey' => $this->public_key,
-				'serviceProviderCode' => $this->service_provider,
-				'verifySSL' => false,
-				'Origin' => "developer.mpesa.vm.co.mz"
+				'base_uri' => 'https://api.sandbox.vm.co.mz:18352',
+				'timeout'  => 90,
 			]);
 
-			$paymentData = [
-				'from' => $number,
-				'reference' => $reference_id,
-				'transaction' => $order_id,
-				'amount' => $amount
-			];
+			$response = $client->request(
+				'POST',
+				'ipg/v1x/c2bPayment/singleStage/',
+				[
+					'http_errors' => false,
+					'verify' => false,
+					'headers' => [
+						'Content-Type' => 'application/json',
+						'Authorization' => 'Bearer ' . $token,
+						'Origin' => 'developer.mpesa.vm.co.mz',
+						'Connection' => 'keep-alive'
+					],
+					'json' => [
+						'input_TransactionReference' => $transaction,
+						'input_CustomerMSISDN' => $number,
+						'input_Amount' => $amount,
+						'input_ThirdPartyReference' => $reference,
+						'input_ServiceProviderCode' => $this->service_provider
+					]
+				]
+			);
 
-				$result = $client->receive($paymentData);
+			wc_add_notice(
+				__('Please try again. START: ' . $response->getBody(), 'mpesa-wp-plugin'),
+				'error'
+			);
+			return json_decode($response->getBody());
+		}
 
-				if($result->success) {
-					return true;
-				} else {
-					return false;
-				}
+		public function mpesa_wp_generate_token() {
+			$key = "-----BEGIN PUBLIC KEY-----\n";
+			$key .= wordwrap($this->public_key, 60, "\n", true);
+			$key .= "\n-----END PUBLIC KEY-----";
+			$pk = openssl_get_publickey($key);
+			openssl_public_encrypt($this->api_key, $token, $pk, OPENSSL_PKCS1_PADDING);
 
+			return base64_encode($token);
 		}
 
 		function generate_reference_id($order_id) {
