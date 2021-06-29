@@ -24,7 +24,6 @@ if (!defined('WPINC')) {
 	wp_die();
 }
 
-//use Paymentsds\MPesa\Client;
 use GuzzleHttp\Client;
 
 
@@ -36,8 +35,6 @@ register_activation_hook(__FILE__, 'mpesa_wp_install');
 add_action('plugins_loaded', 'mpesa_wp_update_check');
 add_action('plugins_loaded', 'mpesa_wp_init', 0);
 add_filter('woocommerce_payment_gateways', 'mpesa_wp_add_gateway_class');
-
-
 
 function mpesa_wp_install() {
 	global $wpdb;
@@ -112,8 +109,6 @@ function mpesa_wp_init() {
 				'woocommerce_update_options_payment_gateways_' . $this->id,
 				array($this, 'process_admin_options')
 			);
-
-			//add_action('wp_enqueue_scripts', array($this, 'payment_scripts'));
 		}
 
 		/**
@@ -162,31 +157,6 @@ function mpesa_wp_init() {
 					'label' => __('Enable Test Environment', 'mpesa-wp-plugin'),
 					'default' => 'yes',
 				),
-			);
-		}
-
-		/*
-		 * Custom CSS and JS
-		 */
-		public function payment_scripts() {
-			if (!is_cart() && !is_checkout() && !isset($_GET['pay_for_order'])) {
-				return;
-			}
-
-			if ('no' == $this->enabled) {
-				return;
-			}
-
-			if (empty($this->api_key) || empty($this->public_key)) {
-				return;
-			}
-
-			wp_enqueue_script(
-				'payment',
-				plugin_dir_url(__FILE__) . '/public/js/main.js',
-				array(),
-				false,
-				true
 			);
 		}
 
@@ -382,12 +352,6 @@ function mpesa_wp_init() {
 		function generate_reference_id($order_id) {
 			//generate uniq reference_id
 			return substr($order_id . bin2hex(random_bytes(5)), 0, 10);
-		}
-
-		/*
-			 * The webhook
-			 */
-		public function webhook() {
 		}
 	}
 }
