@@ -293,7 +293,7 @@ function mpesa_wp_init() {
 					);
 				} else {
 					wc_add_notice(
-						__('Please try again. RESULT: ' . $result->data['code'], 'mpesa-wp-plugin'),
+						__('Please try again', 'mpesa-wp-plugin'),
 						'error'
 					);
 					return;
