@@ -346,5 +346,10 @@ function mpesa_wp_init() {
 				}
 			}
 		}
+
+		function generate_reference_id($order_id) {
+			//generate uniq reference_id
+			return substr($order_id . bin2hex(random_bytes(5)), 0, 10);
+		}
 	}
 }
