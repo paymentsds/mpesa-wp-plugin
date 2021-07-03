@@ -1,0 +1,109 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: mpesa-wp-plugin\n"
+"POT-Creation-Date: 2021-07-01 15:44+0200\n"
+"PO-Revision-Date: 2021-07-01 15:52+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pt_PT\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-SearchPath-0: languages\n"
+"X-Poedit-SearchPath-1: .\n"
+
+#: mpesa-wp-plugin.php:88
+msgid "Mpesa WordPress Plugin"
+msgstr "Mpesa WordPress Plugin"
+
+#: mpesa-wp-plugin.php:89
+msgid "Accept Mpesa payments for your store"
+msgstr "Aceite pagamentos via Mpesa para a sua loja"
+
+#: mpesa-wp-plugin.php:121
+msgid "Enable/Disable"
+msgstr "Habilitar/Desabilitar"
+
+#: mpesa-wp-plugin.php:122
+msgid "Enable Mpesa Wordpress plugin"
+msgstr "Habilitar o Mpesa WordPress Plugin"
+
+#: mpesa-wp-plugin.php:128
+msgid "Title"
+msgstr "Título"
+
+#: mpesa-wp-plugin.php:130
+msgid "This controls the title which the user sees during checkout"
+msgstr "Isso controla o título que o usuário vê durante o pagamento"
+
+#: mpesa-wp-plugin.php:131
+msgid "Mpesa"
+msgstr ""
+
+#: mpesa-wp-plugin.php:135
+msgid "Customer Message"
+msgstr "Mensagem do cliente"
+
+#: mpesa-wp-plugin.php:137
+msgid "Pay via mpesa"
+msgstr "Pague com Mpesa"
+
+#: mpesa-wp-plugin.php:140
+msgid "API Key"
+msgstr ""
+
+#: mpesa-wp-plugin.php:145
+msgid "Public Key"
+msgstr ""
+
+#: mpesa-wp-plugin.php:150
+msgid "Service Provider Code"
+msgstr ""
+
+#: mpesa-wp-plugin.php:152
+msgid "Use 171717 for testing"
+msgstr "Use 171717 para testes"
+
+#: mpesa-wp-plugin.php:156
+msgid "Test Mode"
+msgstr "Modo de testes"
+
+#: mpesa-wp-plugin.php:158
+msgid "Enable Test Environment"
+msgstr "Habilitar ambiente de testes"
+
+#: mpesa-wp-plugin.php:173
+msgid ""
+"<br />\n"
+"\t\t\t\t\t\t<strong>TEST MODE ENABLED</strong>"
+msgstr ""
+"<br />\n"
+"\t\t\t\t\t\t<strong>MODO DE TESTES HABILITADO</strong>"
+
+#: mpesa-wp-plugin.php:221
+msgid "Currency not supported!"
+msgstr "Moeda não suportada"
+
+#: mpesa-wp-plugin.php:231
+msgid "Phone number is required!"
+msgstr "Número de telefone é obrigatório!"
+
+#: mpesa-wp-plugin.php:252
+msgid "Phone number is incorrect!"
+msgstr "Número de telefone inválido!"
+
+#: mpesa-wp-plugin.php:286
+msgid "Your order is paid! Thank you!"
+msgstr "A sua encomenda foi paga! Obrigado!"
+
+#: mpesa-wp-plugin.php:297
+msgid "Please try again"
+msgstr "Por favor, tente novamente"
+
+#: mpesa-wp-plugin.php:337
+msgid "Please try again. START: "
+msgstr "Por favor, tente novamente. START:"

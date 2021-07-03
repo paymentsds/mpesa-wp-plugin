@@ -1,31 +1,33 @@
 <?php
 
 /**
- * Plugin Name: Mpesa WordPress Plugin
- * Plugin URI:
- * Description: Receive payments directly to your store through the Vodacom Mozambique M-Pesa.
- * Author: PaymentsDS
- * Author URI:
- * Version: 0.1.0
- * Text Domain:
+ * Plugin Name: 		Mpesa WordPress Plugin
+ * Plugin URI: 			https://github.com/paymentsds/mpesa-wp-plugin
+ * Description: 		Receive payments directly to your store through the Vodacom Mozambique M-Pesa.
+ * Author: 					PaymentsDS
+ * Author URI: 			https://developers.paymentsds.org/
+ * Version: 				0.1.0
+ * Text Domain: 		mpesa-wp-plugin
+ * Domain Path: 		/languages
  *
- * Copyright: © 2021 PaymentsDS. ()
+ * Copyright: 			© 2021 PaymentsDS. (https://developers.paymentsds.org/)
  *
- * License: GNU General Public License v3.0
- * License URI: http://www.gnu.org/licenses/gpl-3.0.html
+ * License: 				Apache License 2.0
+ * License URI: 		https://www.apache.org/licenses/LICENSE-2.0
  *
- * @author    PaymentsDS
- * @copyright Copyright © 2021 PaymentsDS.
- * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
+ * @author    			PaymentsDS
+ * @copyright 			Copyright © 2021 PaymentsDS.
+ * @license   			https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
  *
  */
 
 if (!defined('WPINC')) {
 	wp_die();
 }
+require 'vendor/autoload.php';
 
-use GuzzleHttp\Client;
-
+use Paymentsds\MPesa\Client;
+use Paymentsds\MPesa\Environment;
 
 if (!defined('MPESA_WP_PLUGIN_VERSION')) {
 	define('MPESA_WP_PLUGIN_VERSION', '0.1.0');
@@ -60,7 +62,7 @@ function mpesa_wp_add_gateway_class($gateways) {
 }
 
 function mpesa_wp_init() {
-	require 'vendor/autoload.php';
+
 
 	if (!class_exists('WC_Payment_Gateway')) {
 		return;
@@ -81,7 +83,7 @@ function mpesa_wp_init() {
 			$this->id = 'mpesa-wp-plugin';
 			$this->icon = apply_filters(
 				'mpesa_wp_icon',
-				plugins_url('public/images/mpesa-logo.png', __FILE__)
+				plugins_url('assets/mpesa-logo.png', __FILE__)
 			);
 			$this->has_fields = false;
 			$this->method_title = __('Mpesa WordPress Plugin', 'mpesa-wp-plugin');
@@ -133,7 +135,7 @@ function mpesa_wp_init() {
 				'description' => array(
 					'title' => __('Customer Message', 'mpesa-wp-plugin'),
 					'type' => 'textarea',
-					'default' => __('Pay via mpesa', 'mpesa-wp-plugin')
+					'default' => __('Insert your number below to proceed with checkout', 'mpesa-wp-plugin')
 				),
 				'api_key' => array(
 					'title' => __('API Key', 'mpesa-wp-plugin'),
@@ -173,10 +175,16 @@ function mpesa_wp_init() {
 						<strong>TEST MODE ENABLED</strong>',
 						'mpesa-wp-plugin'
 					);
-					$this->description  = trim($this->description);
 				}
 
-				echo wpautop(wp_kses_post($this->description));
+				$text = __(
+					'<strong>Pay with Mpesa</strong><br/>',
+					'mpesa-wp-plugin'
+				) . $this->description;
+
+				$text = trim($text);
+
+				echo wpautop(wp_kses_post($text));
 			}
 
 			if (isset($_SESSION['wc_mpesa_number'])) {
@@ -204,7 +212,7 @@ function mpesa_wp_init() {
 						class="wc_mpesa_number"
 						type="tel"
 						autocomplete="off"
-						placeholder="' . esc_attr__('ex: 84 123 4567', 'mpesa-wp-plugin') . '"
+						placeholder="' . esc_attr__('ex: 841234567', 'mpesa-wp-plugin') . '"
 					>
 				</div>
 				<div class="clear"></div>';
@@ -267,14 +275,41 @@ function mpesa_wp_init() {
 				$number = false;
 			}
 
+			//Initialize API
+			$client = new Client([
+				'apiKey' => $this->api_key,             // API Key
+				'publicKey' => $this->public_key,          // Public Key
+				'serviceProviderCode' => $this->service_provider, // input_ServiceProviderCode
+				'debugging' => false,
+				'environment' => 'yes' != $this->test ?? Environment::PRODUCTION
+			]);
+
 			if ($order_id && $number != false) {
 				$amount = $order->get_total();
 				$reference = $this->generate_reference_id($order_id);
 				$number = "258${number}";
 
-				$result = $this->mpesa_wp_execute_transaction($number, $reference, $order_id, $amount);
 
-				if ($result->output_ResponseCode == 'INS-0') {
+
+				try {
+					$paymentData = [
+						'from' => $number,
+						'reference' => $reference,
+						'transaction' => $order_id,
+						'amount' => $amount
+					];
+					$result = $client->receive($paymentData);
+				} catch (\Exception $e) {
+					if (WP_DEBUG) {
+						$error = $e->getMessage();
+						wc_add_notice(
+							"$error",
+							'error'
+						);
+					}
+				}
+
+				if ($result->success) {
 					// Mark as paid
 					$order->payment_complete();
 					// Reduce stock levels
@@ -293,60 +328,23 @@ function mpesa_wp_init() {
 					);
 				} else {
 					wc_add_notice(
-						__('Please try again. RESULT: ' . $result->data['code'], 'mpesa-wp-plugin'),
+						__(
+							'Unfortunately has been an error processing your payment. Please, try again.',
+							'mpesa-wp-plugin'
+						),
 						'error'
 					);
+					if (WP_DEBUG) {
+						$code = $result->data['code'];
+						$description = $result->data['description'];
+						wc_add_notice(
+							$code . ': ' . $description,
+							'error'
+						);
+					}
 					return;
 				}
 			}
-		}
-
-		public function mpesa_wp_execute_transaction($number, $reference, $transaction, $amount) {
-
-			$token = $this->mpesa_wp_generate_token();
-
-			$client = new Client([
-				'base_uri' => 'https://api.sandbox.vm.co.mz:18352',
-				'timeout'  => 90,
-			]);
-
-			$response = $client->request(
-				'POST',
-				'ipg/v1x/c2bPayment/singleStage/',
-				[
-					'http_errors' => false,
-					'verify' => false,
-					'headers' => [
-						'Content-Type' => 'application/json',
-						'Authorization' => 'Bearer ' . $token,
-						'Origin' => 'developer.mpesa.vm.co.mz',
-						'Connection' => 'keep-alive'
-					],
-					'json' => [
-						'input_TransactionReference' => $transaction,
-						'input_CustomerMSISDN' => $number,
-						'input_Amount' => $amount,
-						'input_ThirdPartyReference' => $reference,
-						'input_ServiceProviderCode' => $this->service_provider
-					]
-				]
-			);
-
-			wc_add_notice(
-				__('Please try again. START: ' . $response->getBody(), 'mpesa-wp-plugin'),
-				'error'
-			);
-			return json_decode($response->getBody());
-		}
-
-		public function mpesa_wp_generate_token() {
-			$key = "-----BEGIN PUBLIC KEY-----\n";
-			$key .= wordwrap($this->public_key, 60, "\n", true);
-			$key .= "\n-----END PUBLIC KEY-----";
-			$pk = openssl_get_publickey($key);
-			openssl_public_encrypt($this->api_key, $token, $pk, OPENSSL_PKCS1_PADDING);
-
-			return base64_encode($token);
 		}
 
 		function generate_reference_id($order_id) {
