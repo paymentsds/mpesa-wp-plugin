@@ -6,8 +6,8 @@ M-Pesa Plugin for WordPress aims to help businesses integrating payments using M
 * [Features](#features)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
-** [Auto Installation](#installation-auto)
-** [Manual Installation](#installation-manual)
+  * [Auto Installation](#installation-auto)
+  * [Manual Installation](#installation-manual)
 * [Configuration](#configuration)
 ## Features <a name="features"></a>
 * Receive money from a mobile account to a business account
