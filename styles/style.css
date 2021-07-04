@@ -9,17 +9,17 @@
 
 /* Component */
 .payment-title {
-  font-weight: 400;
+  font-weight: 700;
   font-size: 2em;
-  text-align: center;
+  /*text-align: center;*/
 
 }
 
 .payment-description,
 .payment-error {
-  text-align: left;
+  /*text-align: left;*/
   max-width: 450px;
-  margin: auto;
+  /*margin: auto;*/
 }
 
 .payment-btn {
@@ -27,12 +27,12 @@
   width: 80%;
   background-color: #e60000;
   margin: 10px auto;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 10px 30px;
   color: #fff;
   font-size: 1.5em;
   text-transform: uppercase;
   border: 1px solid #c60000;
+	border-radius: 4px;
 }
 
 .payment-btn:hover {
@@ -43,6 +43,7 @@
 .payment-btn:disabled {
   background-color: #cab4b4;
   border-color:  #c6b4b4;
+	cursor: not-allowed !important;
 }
 
 .payment-error {

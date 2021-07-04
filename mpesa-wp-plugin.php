@@ -227,7 +227,7 @@ function mpesa_wp_init() {
 						name="wc_mpesa_number"
 						class="wc_mpesa_number"
 						type="tel"
-						value="'.esc_attr($number).'"
+						value="' . esc_attr($number) . '"
 						autocomplete="off"
 						placeholder="' . esc_attr__('ex: 841234567', 'mpesa-wp-plugin') . '"
 					>
@@ -300,11 +300,19 @@ function mpesa_wp_init() {
 				'status' => [
 					'intro'  => [
 						'title' => __('Payment Information', 'wc-mpesa-payment-gateway'),
-						'description'  => __('<ul><li>Check your details before pressing the button below.</li><li>Your phone number MUST be registered with MPesa (and Active) for this to work.</li><li>You will receive a pop-up on the phone requesting payment confirmation.</li><li>Enter your service PIN (MPesa) to continue.</li><li>You will receive a confirmation message shortly thereafter</li></ul>', 'wc-mpesa-payment-gateway'),
+						'description'  => __(
+							'<p>
+							Thank you for your order, please click the button bellow to proceed.
+							</p>',
+							'wc-mpesa-payment-gateway'
+						),
 					],
 					'requested' => [
 						'title' => __('Payment request sent!', 'wc-mpesa-payment-gateway'),
-						'description' => __('Check your mobile phone and enter your PIN code to confirm payment ...', 'wc-mpesa-payment-gateway')
+						'description' => __(
+							'<p>You will receive a pop-up on the phone requesting payment confirmation, please enter your PIN code to confirm the payment.</p>',
+							'wc-mpesa-payment-gateway'
+						)
 					],
 					'received' => [
 						'title' => __('Payment received!', 'wc-mpesa-payment-gateway'),
