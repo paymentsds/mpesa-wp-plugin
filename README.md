@@ -21,7 +21,7 @@ To use this plugin it is necessary to:
 ### Auto installation <a name="installation-auto"></a>
 
 ### Manual installation <a name="installation-manual"></a>
-* First, you need to download the latest version of the plugin from [here](https://github.com/paymentsds/mpesa-wp-plugin/).
+* First, you need to download the latest version of the plugin from the [releases page]https://github.com/paymentsds/mpesa-wp-plugin/releases).
 * Upload the plugin folder to your WordPress installation's wp-content/plugins/ directory.
 * Activate the plugin from the Plugins menu within the WordPress admin.
 ## Configuration <a name="configuration"></a>
