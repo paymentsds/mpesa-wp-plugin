@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: mpesa-wp-plugin\n"
-"POT-Creation-Date: 2021-07-01 15:44+0200\n"
-"PO-Revision-Date: 2021-07-01 15:52+0200\n"
+"POT-Creation-Date: 2021-07-04 15:25+0200\n"
+"PO-Revision-Date: 2021-07-04 15:42+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_PT\n"
@@ -16,67 +16,67 @@ msgstr ""
 "X-Poedit-SearchPath-0: languages\n"
 "X-Poedit-SearchPath-1: .\n"
 
-#: mpesa-wp-plugin.php:88
+#: mpesa-wp-plugin.php:86
 msgid "Mpesa WordPress Plugin"
 msgstr "Mpesa WordPress Plugin"
 
-#: mpesa-wp-plugin.php:89
+#: mpesa-wp-plugin.php:87
 msgid "Accept Mpesa payments for your store"
 msgstr "Aceite pagamentos via Mpesa para a sua loja"
 
-#: mpesa-wp-plugin.php:121
+#: mpesa-wp-plugin.php:138
 msgid "Enable/Disable"
 msgstr "Habilitar/Desabilitar"
 
-#: mpesa-wp-plugin.php:122
+#: mpesa-wp-plugin.php:139
 msgid "Enable Mpesa Wordpress plugin"
 msgstr "Habilitar o Mpesa WordPress Plugin"
 
-#: mpesa-wp-plugin.php:128
+#: mpesa-wp-plugin.php:145
 msgid "Title"
 msgstr "Título"
 
-#: mpesa-wp-plugin.php:130
+#: mpesa-wp-plugin.php:147
 msgid "This controls the title which the user sees during checkout"
 msgstr "Isso controla o título que o usuário vê durante o pagamento"
 
-#: mpesa-wp-plugin.php:131
+#: mpesa-wp-plugin.php:148
 msgid "Mpesa"
 msgstr ""
 
-#: mpesa-wp-plugin.php:135
+#: mpesa-wp-plugin.php:152
 msgid "Customer Message"
 msgstr "Mensagem do cliente"
 
-#: mpesa-wp-plugin.php:137
-msgid "Pay via mpesa"
-msgstr "Pague com Mpesa"
+#: mpesa-wp-plugin.php:154
+msgid "Insert your number below to proceed with checkout"
+msgstr "Insira o seu número no campo abaixo para prosseguir com o pagamento"
 
-#: mpesa-wp-plugin.php:140
+#: mpesa-wp-plugin.php:157
 msgid "API Key"
 msgstr ""
 
-#: mpesa-wp-plugin.php:145
+#: mpesa-wp-plugin.php:162
 msgid "Public Key"
 msgstr ""
 
-#: mpesa-wp-plugin.php:150
+#: mpesa-wp-plugin.php:167
 msgid "Service Provider Code"
 msgstr ""
 
-#: mpesa-wp-plugin.php:152
+#: mpesa-wp-plugin.php:169
 msgid "Use 171717 for testing"
 msgstr "Use 171717 para testes"
 
-#: mpesa-wp-plugin.php:156
+#: mpesa-wp-plugin.php:173
 msgid "Test Mode"
 msgstr "Modo de testes"
 
-#: mpesa-wp-plugin.php:158
+#: mpesa-wp-plugin.php:175
 msgid "Enable Test Environment"
 msgstr "Habilitar ambiente de testes"
 
-#: mpesa-wp-plugin.php:173
+#: mpesa-wp-plugin.php:190
 msgid ""
 "<br />\n"
 "\t\t\t\t\t\t<strong>TEST MODE ENABLED</strong>"
@@ -84,26 +84,219 @@ msgstr ""
 "<br />\n"
 "\t\t\t\t\t\t<strong>MODO DE TESTES HABILITADO</strong>"
 
-#: mpesa-wp-plugin.php:221
-msgid "Currency not supported!"
-msgstr "Moeda não suportada"
+#: mpesa-wp-plugin.php:197
+msgid "<strong>Pay with Mpesa</strong><br/>"
+msgstr "<strong>Pagar com Mpesa</strong><br/>"
 
-#: mpesa-wp-plugin.php:231
+#: mpesa-wp-plugin.php:245
+msgid "Currency not supported!"
+msgstr "Moeda não suportada!"
+
+#: mpesa-wp-plugin.php:255
 msgid "Phone number is required!"
 msgstr "Número de telefone é obrigatório!"
 
-#: mpesa-wp-plugin.php:252
+#: mpesa-wp-plugin.php:276
 msgid "Phone number is incorrect!"
 msgstr "Número de telefone inválido!"
 
-#: mpesa-wp-plugin.php:286
+#: mpesa-wp-plugin.php:302
+msgid "Payment Information"
+msgstr "Informação de pagamento"
+
+#: mpesa-wp-plugin.php:304
+#, fuzzy
+msgid ""
+"<p>\n"
+"\t\t\t\t\t\t\tThank you for your order, please click the button bellow to "
+"proceed.\n"
+"\t\t\t\t\t\t\t</p>"
+msgstr ""
+"<p>\n"
+"\t\t\t\t\t\t\tObrigado pela preferência, por favor clique no botão abaixo "
+"para prosseguir.\n"
+"\t\t\t\t\t\t\t</p>"
+
+#: mpesa-wp-plugin.php:311
+msgid "Payment request sent!"
+msgstr "Pedido de pagamento enviado!"
+
+#: mpesa-wp-plugin.php:313
+msgid ""
+"<p>You will receive a pop-up on the phone requesting payment confirmation, "
+"please enter your PIN code to confirm the payment.</p>"
+msgstr ""
+"<p>Você irá receber uma janela na tela do seu celular para confirmar o "
+"pagamento, por favor insira o seu PIN.</p>"
+
+#: mpesa-wp-plugin.php:318
+msgid "Payment received!"
+msgstr "Pagamento recebido!"
+
+#: mpesa-wp-plugin.php:319
+msgid "Your payment has been received and your order will be processed soon."
+msgstr ""
+"O seu pagamento foi recebido e a sua compra será processada brevemente."
+
+#: mpesa-wp-plugin.php:322
+#, fuzzy
+msgid "Payment timeout exceeded!"
+msgstr "Tempo para pagamento esgotado!"
+
+#: mpesa-wp-plugin.php:323
+msgid "Use your browser's back button and try again."
+msgstr "Use o botão de voltar do seu navegador e tente novamente."
+
+#: mpesa-wp-plugin.php:326
+msgid "Payment failed!"
+msgstr "Pagamento falhou!"
+
+#: mpesa-wp-plugin.php:327
+msgid "Try again or use your browser's back button to change the number."
+msgstr "Use o botão de voltar do seu navegador para alterar o número."
+
+#: mpesa-wp-plugin.php:332 mpesa-wp-plugin.php:358
+msgid "Pay"
+msgstr "Pagar"
+
+#: mpesa-wp-plugin.php:445
 msgid "Your order is paid! Thank you!"
 msgstr "A sua encomenda foi paga! Obrigado!"
 
-#: mpesa-wp-plugin.php:297
-msgid "Please try again"
-msgstr "Por favor, tente novamente"
+#: mpesa-wp-plugin.php:458
+msgid "Payment failed"
+msgstr "Pagamento falhou"
 
-#: mpesa-wp-plugin.php:337
-msgid "Please try again. START: "
-msgstr "Por favor, tente novamente. START:"
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "num"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "string"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "template_head"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "comment2"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "regexp"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "operator"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "eof"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "expand"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "punc"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "arrow"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "name"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "atom"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "keyword"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "("
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid ")"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid ":"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid ";"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid ","
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "]"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "}"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "{"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "["
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "Program"
+msgstr ""
+
+#: node_modules/terser/dist/bundle.min.js:1
+msgid "BlockStatement"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:105
+msgid "is not a finite number"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:172
+#: node_modules/webidl-conversions/lib/index.js:188
+msgid "is not a finite floating-point value"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:198
+msgid "is outside the range of a single-precision floating-point value"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:228
+msgid "is a symbol, which cannot be converted to a string"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:239
+msgid "is not a valid ByteString"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:276
+msgid "is not an object"
+msgstr ""
+
+#: node_modules/webidl-conversions/lib/index.js:288
+msgid "is not a function"
+msgstr ""
+
+#~ msgid "Pay via mpesa"
+#~ msgstr "Pague com Mpesa"
+
+#~ msgid "Please try again"
+#~ msgstr "Por favor, tente novamente"
+
+#~ msgid "Please try again. START: "
+#~ msgstr "Por favor, tente novamente. START:"
