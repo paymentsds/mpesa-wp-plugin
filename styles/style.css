@@ -1,0 +1,63 @@
+/* Override */
+.checkbox.pull-right {
+  margin: 0;
+}
+
+.entry-header {
+  padding-bottom: 5px !important;
+}
+
+/* Component */
+.payment-title {
+  font-weight: 400;
+  font-size: 2em;
+  text-align: center;
+
+}
+
+.payment-description,
+.payment-error {
+  text-align: left;
+  max-width: 450px;
+  margin: auto;
+}
+
+.payment-btn {
+  display: block;
+  width: 80%;
+  background-color: #e60000;
+  margin: 10px auto;
+  padding-left: 30px;
+  padding-right: 30px;
+  color: #fff;
+  font-size: 1.5em;
+  text-transform: uppercase;
+  border: 1px solid #c60000;
+}
+
+.payment-btn:hover {
+  background-color: #cd0000;
+}
+
+
+.payment-btn:disabled {
+  background-color: #cab4b4;
+  border-color:  #c6b4b4;
+}
+
+.payment-error {
+  color: #b44;
+}
+
+
+@media screen and (min-width : 720px) {
+  .payment-btn {
+    width: 50%;
+  }
+}
+
+
+/* hide syntax loading */
+[v-cloak] {
+  display: none;
+}

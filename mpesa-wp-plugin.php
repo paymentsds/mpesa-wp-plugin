@@ -76,9 +76,6 @@ function mpesa_wp_init() {
 
 	class Mpesa_WP_Plugin extends WC_Payment_Gateway {
 
-		/**
-		 * Plugin Class constructor
-		 */
 		public function __construct() {
 			$this->id = 'mpesa-wp-plugin';
 			$this->icon = apply_filters(
@@ -106,11 +103,30 @@ function mpesa_wp_init() {
 			$this->test = $this->get_option('test');
 			$this->enabled = $this->get_option('enabled');
 
-			// Save the settings
+			// Actions
 			add_action(
 				'woocommerce_update_options_payment_gateways_' . $this->id,
 				array($this, 'process_admin_options')
 			);
+
+			add_action(
+				'woocommerce_receipt_' . $this->id,
+				array($this, 'payment_form_html')
+			);
+			add_action(
+				'wp_enqueue_scripts',
+				array($this, 'payment_scripts')
+			);
+			add_action(
+				'woocommerce_api_process_action',
+				array($this, 'process_action')
+			);
+
+			/**
+			 * Set a minimum order amount for checkout
+			 */
+			add_action('woocommerce_checkout_process', 'wc_minimum_order_amount');
+			add_action('woocommerce_before_cart', 'wc_minimum_order_amount');
 		}
 
 		/**
@@ -211,6 +227,7 @@ function mpesa_wp_init() {
 						name="wc_mpesa_number"
 						class="wc_mpesa_number"
 						type="tel"
+						value="'.esc_attr($number).'"
 						autocomplete="off"
 						placeholder="' . esc_attr__('ex: 841234567', 'mpesa-wp-plugin') . '"
 					>
@@ -262,18 +279,101 @@ function mpesa_wp_init() {
 			return $number;
 		}
 
+		function payment_scripts() {
+			if (!is_checkout_pay_page()) {
+				return;
+			}
+			if ('no' == $this->enabled) {
+				return;
+			}
+			// Load only on specified pages
+
+			wp_enqueue_script(
+				'payment',
+				plugin_dir_url(__FILE__) . '/scripts/main.js',
+				array(),
+				false,
+				true
+			);
+
+			wp_localize_script('payment', 'payment_text', [
+				'status' => [
+					'intro'  => [
+						'title' => __('Payment Information', 'wc-mpesa-payment-gateway'),
+						'description'  => __('<ul><li>Check your details before pressing the button below.</li><li>Your phone number MUST be registered with MPesa (and Active) for this to work.</li><li>You will receive a pop-up on the phone requesting payment confirmation.</li><li>Enter your service PIN (MPesa) to continue.</li><li>You will receive a confirmation message shortly thereafter</li></ul>', 'wc-mpesa-payment-gateway'),
+					],
+					'requested' => [
+						'title' => __('Payment request sent!', 'wc-mpesa-payment-gateway'),
+						'description' => __('Check your mobile phone and enter your PIN code to confirm payment ...', 'wc-mpesa-payment-gateway')
+					],
+					'received' => [
+						'title' => __('Payment received!', 'wc-mpesa-payment-gateway'),
+						'description' => __('Your payment has been received and your order will be processed soon.', 'wc-mpesa-payment-gateway')
+					],
+					'timeout' => [
+						'title' => __('Payment timeout exceeded!', 'wc-mpesa-payment-gateway'),
+						'description' => __('Use your browser\'s back button and try again.', 'wc-mpesa-payment-gateway')
+					],
+					'failed' => [
+						'title' => __('Payment failed!', 'wc-mpesa-payment-gateway'),
+						'description' => __('Try again or use your browser\'s back button to change the number.', 'wc-mpesa-payment-gateway')
+					],
+
+				],
+				'buttons' => [
+					'pay' => __('Pay', 'wc-mpesa-payment-gateway'),
+				]
+			]);
+			wp_enqueue_style(
+				'style',
+				plugin_dir_url(__FILE__) . '/styles/style.css',
+				false,
+				false,
+				'all'
+			);
+		}
+
+		function payment_form_html($order_id) {
+			// modify post object here
+			$order = new WC_Order($order_id);
+			$return_url = $this->get_return_url($order);
+			$data = json_encode([
+				'order_id' => $order_id,
+				'return_url' => $return_url
+			]);
+			$html_output = "<div class='payment-container' id='app'>
+            <div>
+              <h4 class='payment-title' v-cloak>{{status.title}}</h4>
+              <div v-if='error' class='payment-error' role='error'>{{error}}</div>
+              <div class='payment-description' role='alert' v-html='status.description'></div>
+            </div>
+            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'wc-mpesa-payment-gateway') . "</button></div>";
+			echo $html_output;
+		}
+
 		/*
 			 * We're processing the payments here
 			 */
 		public function process_payment($order_id) {
 			session_start();
 			$order = new WC_Order($order_id);
+			$checkout_url = $order->get_checkout_payment_url(true);
+
+			return array(
+				'result' => 'success',
+				'redirect' => $checkout_url
+			);
+		}
+
+		function process_action() {
+			session_start();
 
 			if (isset($_SESSION['wc_mpesa_number'])) {
 				$number = $this->wc_mpesa_validate_number($_SESSION['wc_mpesa_number']);
 			} else {
 				$number = false;
 			}
+			$response = [];
 
 			//Initialize API
 			$client = new Client([
@@ -284,12 +384,19 @@ function mpesa_wp_init() {
 				'environment' => 'yes' != $this->test ?? Environment::PRODUCTION
 			]);
 
+			$order = new WC_Order(filter_input(
+				INPUT_POST,
+				'order_id',
+				FILTER_VALIDATE_INT
+			));
+
+			$order_id = $order->get_id();
+
+			//wc_add_notice(__('Phone number is incorrect!' . $number, 'mpesa-wp-plugin'), 'error');
 			if ($order_id && $number != false) {
 				$amount = $order->get_total();
 				$reference = $this->generate_reference_id($order_id);
 				$number = "258${number}";
-
-
 
 				try {
 					$paymentData = [
@@ -300,13 +407,23 @@ function mpesa_wp_init() {
 					];
 					$result = $client->receive($paymentData);
 				} catch (\Exception $e) {
+					$response['status'] = 'failed';
 					if (WP_DEBUG) {
-						$error = $e->getMessage();
-						wc_add_notice(
-							"$error",
-							'error'
-						);
+						$response['error_message'] = $e->getMessage();
+						$response['raw'] =  $result->response;
+						$response['request'] = [
+							'order_id' => $order_id,
+							'phone' => $number,
+							'amount' => $amount,
+							'reference_id' => $reference,
+							'service_provider' => $this->service_provider,
+						];
 					}
+					return wp_send_json_error($response);
+				}
+
+				if ('yes' == $this->test) {
+					$response['raw'] =  $result->response;
 				}
 
 				if ($result->success) {
@@ -322,34 +439,57 @@ function mpesa_wp_init() {
 					);
 					WC()->cart->empty_cart();
 
-					return array(
-						'result' => 'success',
-						'redirect' => $this->get_return_url($order)
-					);
+					$response['status'] = 'success';
 				} else {
-					wc_add_notice(
+					$response['status'] = 'failed';
+					$response['error_message'] = $result->data['description'];
+
+					$order->update_status(
+						'failed',
 						__(
-							'Unfortunately has been an error processing your payment. Please, try again.',
-							'mpesa-wp-plugin'
-						),
-						'error'
+							'Payment failed',
+							'wc-mpesa-payment-gateway'
+						)
 					);
-					if (WP_DEBUG) {
-						$code = $result->data['code'];
-						$description = $result->data['description'];
-						wc_add_notice(
-							$code . ': ' . $description,
-							'error'
-						);
-					}
-					return;
 				}
 			}
+
+			wp_send_json($response);
 		}
 
 		function generate_reference_id($order_id) {
 			//generate uniq reference_id
 			return substr($order_id . bin2hex(random_bytes(5)), 0, 10);
 		}
-	}
+
+		function wc_minimum_order_amount() {
+			// Set this variable to specify a minimum order value
+			$minimum = 1;
+
+			if (WC()->cart->total < $minimum) {
+
+				if (is_cart()) {
+
+					wc_print_notice(
+						sprintf(
+							'Your current order total is %s — you must have an order with a minimum of %s to place your order ',
+							wc_price(WC()->cart->total),
+							wc_price($minimum)
+						),
+						'error'
+					);
+				} else {
+
+					wc_add_notice(
+						sprintf(
+							'Your current order total is %s — you must have an order with a minimum of %s to place your order',
+							wc_price(WC()->cart->total),
+							wc_price($minimum)
+						),
+						'error'
+					);
+				}
+			}
+		}
+	} // end of class Mpesa_WP_Plugin
 }

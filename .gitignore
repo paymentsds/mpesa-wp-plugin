@@ -4,4 +4,5 @@ languages/mpesa-wp-plugin-pt_BR-backup-*
 vendor
 .cache
 .vscode
+node_modules
 !/.gitignore
