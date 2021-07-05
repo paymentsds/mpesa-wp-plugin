@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: 		PaymentsDS - Mpesa WordPress Plugin
+ * Plugin Name: 		PaymentsDS - Mpesa WordPress Plugin for WooCommerce
  * Plugin URI: 			https://github.com/paymentsds/mpesa-wp-plugin
  * Description: 		Receive payments directly to your store through the Vodacom Mozambique M-Pesa.
  * Author: 					PaymentsDS
@@ -12,12 +12,12 @@
  *
  * Copyright: 			© 2021 PaymentsDS. (https://developers.paymentsds.org/)
  *
- * License: 				Apache License 2.0
- * License URI: 		https://www.apache.org/licenses/LICENSE-2.0
+ * License: 				GNU General Public License
+ * License URI: 		http://www.gnu.org/licenses/gpl-3.0.en.html
  *
  * @author    			PaymentsDS
  * @copyright 			Copyright © 2021 PaymentsDS.
- * @license   			https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
+ * @license   			http://www.gnu.org/licenses/gpl-3.0.en.html GNU General Public License
  *
  */
 
