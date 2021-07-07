@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: 		PaymentsDS - Mpesa WordPress Plugin for WooCommerce
+ * Plugin Name: 		PaymentsDS - Mpesa Payment Gateway for WooCommerce
  * Plugin URI: 			https://github.com/paymentsds/mpesa-wp-plugin
  * Description: 		Receive payments directly to your store through the Vodacom Mozambique M-Pesa.
  * Author: 					PaymentsDS

@@ -1,4 +1,4 @@
-=== PaymentsDS - Mpesa WordPress Plugin for WooCommerce  ===
+=== PaymentsDS - Mpesa Payment Gateway for WooCommerce  ===
 Contributors: ltsaiete, karson9
 Author URI: https://developers.paymentsds.org/
 Plugin URL:
@@ -14,8 +14,8 @@ Adiciona Mpesa como método de pagamento ao WooCommerce.
 
 == Description ==
 
-O plugin *PaymentsDS - Mpesa WordPress Plugin for WooCommerce* é uma extensão para WooCommerce e WordPress que permite que você receba pagamentos diretamente em sua loja virtual através do M-Pesa da Vodacom Moçambique.
-Por meio do *PaymentsDS - Mpesa WordPress Plugin for WooCommerce*, os compradores de sua loja podem comprar produtos ou serviços em sua loja usando um número de telefone associado à conta M-Pesa.
+O plugin *PaymentsDS - Mpesa Payment Gateway for WooCommerce* é uma extensão para WooCommerce e WordPress que permite que você receba pagamentos diretamente em sua loja virtual através do M-Pesa da Vodacom Moçambique.
+Por meio do *PaymentsDS - Mpesa Payment Gateway for WooCommerce*, os compradores de sua loja podem comprar produtos ou serviços em sua loja usando um número de telefone associado à conta M-Pesa.
 
 == Other Notes ==
 
@@ -47,8 +47,8 @@ Este plugin foi desenvolvido sem nenhum incentivo da Vodacom. Nenhum dos desenvo
 
 1. Faça login no seu painel do WordPress
 2. Clique em *Plugins > Adicionar novo* no menu esquerdo.
-3. Na caixa de pesquisa, digite **PaymentsDS - Mpesa WordPress Plugin for WooCommerce**.
-4. Clique em *Instalar agora* no **PaymentsDS - Mpesa WordPress Plugin for WooCommerce** para instalar o plug-in no seu site e em seguida clique em  *ativar* o plug-in.
+3. Na caixa de pesquisa, digite **PaymentsDS - Mpesa Payment Gateway for WooCommerce**.
+4. Clique em *Instalar agora* no **PaymentsDS - Mpesa Payment Gateway for WooCommerce** para instalar o plug-in no seu site e em seguida clique em  *ativar* o plug-in.
 5. Clique em *WooCommerce > Configurações* no menu esquerdo e clique na guia *Pagamentos*.
 6. Clique em **Mpesa for WooCommerce** na lista dos métodos de pagamento disponíveis
 7. Defina as configurações do Mpesa for WooCommerce usando credenciais disponíveis em https://developer.mpesa.vm.co.mz/
@@ -58,7 +58,7 @@ Este plugin foi desenvolvido sem nenhum incentivo da Vodacom. Nenhum dos desenvo
 Caso a instalação automática não funcione, faça o download do plug-in aqui usando o botão Download.
 
 1. Descompacte o arquivo e carregue a pasta via FTP no diretório *wp-content/plugins* da sua instalação do WordPress.
-2. Vá para *Plugins > Plugins instalados* e clique em *Ativar* no PaymentsDS - Mpesa WordPress Plugin for WooCommerce.
+2. Vá para *Plugins > Plugins instalados* e clique em *Ativar* no PaymentsDS - Mpesa Payment Gateway for WooCommerce.
 
 == Screenshots ==
 
