@@ -44,10 +44,22 @@ function mpesa_wp_install() {
 
 	if (!get_option('mpesa_wp_version', MPESA_WP_PLUGIN_VERSION)) {
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		$wpdb->query("DROP TABLE IF EXISTS $table_name");
+		// $wpdb->query("DROP TABLE IF EXISTS $table_name");
 
 		update_option('mpesa_wp_version');
 	}
+	// Creating transactions table
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+  id mediumint(9) NOT NULL AUTO_INCREMENT,
+  order_id varchar(9) NOT NULL UNIQUE,
+  phone varchar(12) NOT NULL ,
+  PRIMARY KEY  (id)
+) $charset_collate;";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	dbDelta($sql);
 }
 
 function mpesa_wp_update_check() {
@@ -87,7 +99,8 @@ function mpesa_wp_init() {
 			$this->method_description = __('Accept Mpesa payments for your store', 'mpesa-wp-plugin');
 
 			$this->supports = array(
-				'products'
+				'products',
+				'refunds'
 			);
 
 			// Load settings
@@ -400,7 +413,6 @@ function mpesa_wp_init() {
 
 			$order_id = $order->get_id();
 
-			//wc_add_notice(__('Phone number is incorrect!' . $number, 'mpesa-wp-plugin'), 'error');
 			if ($order_id && $number != false) {
 				$amount = $order->get_total();
 				$reference = $this->generate_reference_id($order_id);
@@ -446,6 +458,17 @@ function mpesa_wp_init() {
 						true
 					);
 					WC()->cart->empty_cart();
+
+					// Storing payment data
+					global $wpdb;
+					$table_name = $wpdb->prefix . "mpesa_wp_transactions";
+					$wpdb->insert(
+						$table_name,
+						array(
+							'order_id' => $order_id,
+							'phone' => $number,
+						)
+					);
 
 					$response['status'] = 'success';
 				} else {
@@ -498,6 +521,18 @@ function mpesa_wp_init() {
 					);
 				}
 			}
+		}
+
+		// Processing refunds
+		public function process_refund($order_id, $amount = null, $reason = "") {
+			global $wpdb;
+			$table_name = $wpdb->prefix . "mpesa_wp_transactions";
+
+			$transaction = $wpdb->get_row("SELECT order_id, phone FROM $table_name WHERE order_id = $order_id LIMIT 0,1");
+
+			wc_add_notice(__('Phone number ', $transaction->phone, 'mpesa-wp-plugin'), 'error');
+
+			return false;
 		}
 	} // end of class Mpesa_WP_Plugin
 }
