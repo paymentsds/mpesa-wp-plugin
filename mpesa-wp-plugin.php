@@ -525,14 +525,52 @@ function mpesa_wp_init() {
 
 		// Processing refunds
 		public function process_refund($order_id, $amount = null, $reason = "") {
+			$order = wc_get_order($order_id);
+
+			if (!is_a($order, 'WC_Order')) {
+				return false;
+			}
+
+			if ('refunded' == $order->get_status()) {
+				return false;
+			}
+
 			global $wpdb;
 			$table_name = $wpdb->prefix . "mpesa_wp_transactions";
 
 			$transaction = $wpdb->get_row("SELECT order_id, phone FROM $table_name WHERE order_id = $order_id LIMIT 0,1");
 
-			wc_add_notice(__('Phone number ', $transaction->phone, 'mpesa-wp-plugin'), 'error');
+			if (strlen($transaction->phone) != 12) {
+				return false;
+			}
+			$reference = $this->generate_reference_id($order_id);
 
-			return false;
+			//Initialize API
+			$client = new Client([
+				'apiKey' => $this->api_key,
+				'publicKey' => $this->public_key,
+				'serviceProviderCode' => $this->service_provider,
+				'debugging' => false,
+				'environment' => 'yes' != $this->test ?? Environment::PRODUCTION
+			]);
+
+			try {
+				$paymentData = [
+					'to' => $transaction->phone,
+					'reference' => $reference,
+					'transaction' => $order_id,
+					'amount' => $amount
+				];
+				$result = $client->send($paymentData);
+			} catch (\Exception $e) {
+				return false;
+			}
+
+			if ($result->success) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	} // end of class Mpesa_WP_Plugin
 }
