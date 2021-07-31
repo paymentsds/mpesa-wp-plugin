@@ -343,6 +343,7 @@ function mpesa_wp_init() {
 				],
 				'buttons' => [
 					'pay' => __('Pay', 'wc-mpesa-payment-gateway'),
+					'back' => __('Back', 'wc-mpesa-payment-gateway'),
 				]
 			]);
 			wp_enqueue_style(
@@ -368,7 +369,15 @@ function mpesa_wp_init() {
               <div v-if='error' class='payment-error' role='error'>{{error}}</div>
               <div class='payment-description' role='alert' v-html='status.description'></div>
             </div>
-            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'wc-mpesa-payment-gateway') . "</button></div>";
+						<div class='btn-container' >
+            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'wc-mpesa-payment-gateway') . "</button>
+						<button
+							class='back-btn'
+							type='button'
+							onClick='history.back()';
+						>". __('Back', 'wc-mpesa-payment-gateway') ."</button>
+						</div>
+						</div>";
 			echo $html_output;
 		}
 
