@@ -12,7 +12,6 @@
   font-weight: 700;
   font-size: 2em;
   /*text-align: center;*/
-
 }
 
 .payment-description,
@@ -23,60 +22,59 @@
 }
 
 .btn-container {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.payment-btn,
+.back-btn {
+  padding: 10px 30px;
+  color: #fff;
+  border-radius: 4px;
+	font-size: 1.3em;
 }
 
 .payment-btn {
-  width: 48%;
-  padding: 10px 30px;
-  color: #fff;
-  font-size: 1.5em;
-  text-transform: uppercase;
-	border-radius: 4px;
-}
-
-.payment-btn:disabled {
-  background-color: #cab4b4;
-  border-color:  #c6b4b4;
-	cursor: not-allowed !important;
+	width: 60%;
 }
 
 .back-btn {
-	width: 48%;
-  padding: 10px 30px;
-  color: #fff;
-  font-size: 1.5em;
-  text-transform: uppercase;
-	border-radius: 4px;
-	background-color: #e60000;
+	width: 38%;
+}
+
+.payment-btn:disabled {
+  background-color: #9C98A6;
+  cursor: not-allowed !important;
+}
+
+.back-btn {
+	background-color: #9C98A6;
 }
 
 .back-btn:hover {
-  background-color: #cd0000;
+  background-color: #898691;
 }
 
 .payment-error {
   color: #b44;
 }
 
-
-@media screen and (min-width : 720px) {
-	.btn-container {
-		justify-content: flex-start;
-	}
-
-  .payment-btn, .back-btn {
-    width: 300px;
+@media screen and (min-width: 720px) {
+  .btn-container {
+    justify-content: flex-start;
   }
 
-	.back-btn {
-		margin-left: 12px;
-	}
-}
+  .payment-btn{
+    width: 30%;
+  }
 
+  .back-btn {
+		width: 19%;
+    margin-left: 1%;
+  }
+}
 
 /* hide syntax loading */
 [v-cloak] {

@@ -343,7 +343,6 @@ function mpesa_wp_init() {
 				],
 				'buttons' => [
 					'pay' => __('Pay', 'wc-mpesa-payment-gateway'),
-					'back' => __('Back', 'wc-mpesa-payment-gateway'),
 				]
 			]);
 			wp_enqueue_style(
@@ -374,7 +373,7 @@ function mpesa_wp_init() {
 						<button
 							class='back-btn'
 							type='button'
-							onClick='history.back()';
+							onClick='history.back();'
 						>". __('Back', 'wc-mpesa-payment-gateway') ."</button>
 						</div>
 						</div>";
