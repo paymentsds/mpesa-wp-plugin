@@ -6,7 +6,7 @@
  * Description: 		Receive payments directly to your store through the Vodacom Mozambique M-Pesa.
  * Author: 					PaymentsDS
  * Author URI: 			https://developers.paymentsds.org/
- * Version: 				0.1.1
+ * Version: 				1.0
  * Text Domain: 		mpesa-wp-plugin
  * Domain Path: 		/languages
  *
@@ -30,7 +30,7 @@ use Paymentsds\MPesa\Client;
 use Paymentsds\MPesa\Environment;
 
 if (!defined('MPESA_WP_PLUGIN_VERSION')) {
-	define('MPESA_WP_PLUGIN_VERSION', '0.1.1');
+	define('MPESA_WP_PLUGIN_VERSION', '1.0');
 }
 
 register_activation_hook(__FILE__, 'mpesa_wp_install');
@@ -44,10 +44,22 @@ function mpesa_wp_install() {
 
 	if (!get_option('mpesa_wp_version', MPESA_WP_PLUGIN_VERSION)) {
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		$wpdb->query("DROP TABLE IF EXISTS $table_name");
+		// $wpdb->query("DROP TABLE IF EXISTS $table_name");
 
 		update_option('mpesa_wp_version');
 	}
+	// Creating transactions table
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+  id mediumint(9) NOT NULL AUTO_INCREMENT,
+  order_id varchar(9) NOT NULL UNIQUE,
+  phone varchar(12) NOT NULL ,
+  PRIMARY KEY  (id)
+) $charset_collate;";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	dbDelta($sql);
 }
 
 function mpesa_wp_update_check() {
@@ -87,7 +99,8 @@ function mpesa_wp_init() {
 			$this->method_description = __('Accept Mpesa payments for your store', 'mpesa-wp-plugin');
 
 			$this->supports = array(
-				'products'
+				'products',
+				'refunds'
 			);
 
 			// Load settings
@@ -355,7 +368,15 @@ function mpesa_wp_init() {
               <div v-if='error' class='payment-error' role='error'>{{error}}</div>
               <div class='payment-description' role='alert' v-html='status.description'></div>
             </div>
-            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'wc-mpesa-payment-gateway') . "</button></div>";
+						<div class='btn-container' >
+            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'wc-mpesa-payment-gateway') . "</button>
+						<button
+							class='back-btn'
+							type='button'
+							onClick='history.back();'
+						>". __('Back', 'wc-mpesa-payment-gateway') ."</button>
+						</div>
+						</div>";
 			echo $html_output;
 		}
 
@@ -400,7 +421,6 @@ function mpesa_wp_init() {
 
 			$order_id = $order->get_id();
 
-			//wc_add_notice(__('Phone number is incorrect!' . $number, 'mpesa-wp-plugin'), 'error');
 			if ($order_id && $number != false) {
 				$amount = $order->get_total();
 				$reference = $this->generate_reference_id($order_id);
@@ -446,6 +466,17 @@ function mpesa_wp_init() {
 						true
 					);
 					WC()->cart->empty_cart();
+
+					// Storing payment data
+					global $wpdb;
+					$table_name = $wpdb->prefix . "mpesa_wp_transactions";
+					$wpdb->insert(
+						$table_name,
+						array(
+							'order_id' => $order_id,
+							'phone' => $number,
+						)
+					);
 
 					$response['status'] = 'success';
 				} else {
@@ -497,6 +528,56 @@ function mpesa_wp_init() {
 						'error'
 					);
 				}
+			}
+		}
+
+		// Processing refunds
+		public function process_refund($order_id, $amount = null, $reason = "") {
+			$order = wc_get_order($order_id);
+
+			if (!is_a($order, 'WC_Order')) {
+				return false;
+			}
+
+			if ('refunded' == $order->get_status()) {
+				return false;
+			}
+
+			global $wpdb;
+			$table_name = $wpdb->prefix . "mpesa_wp_transactions";
+
+			$transaction = $wpdb->get_row("SELECT order_id, phone FROM $table_name WHERE order_id = $order_id LIMIT 0,1");
+
+			if (strlen($transaction->phone) != 12) {
+				return false;
+			}
+			$reference = $this->generate_reference_id($order_id);
+
+			//Initialize API
+			$client = new Client([
+				'apiKey' => $this->api_key,
+				'publicKey' => $this->public_key,
+				'serviceProviderCode' => $this->service_provider,
+				'debugging' => false,
+				'environment' => 'yes' != $this->test ?? Environment::PRODUCTION
+			]);
+
+			try {
+				$paymentData = [
+					'to' => $transaction->phone,
+					'reference' => $reference,
+					'transaction' => $order_id,
+					'amount' => $amount
+				];
+				$result = $client->send($paymentData);
+			} catch (\Exception $e) {
+				return false;
+			}
+
+			if ($result->success) {
+				return true;
+			} else {
+				return false;
 			}
 		}
 	} // end of class Mpesa_WP_Plugin
