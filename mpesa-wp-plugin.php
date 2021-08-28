@@ -6,7 +6,7 @@
  * Description: 		Receive payments directly to your store through the Vodacom Mozambique M-Pesa.
  * Author: 					PaymentsDS
  * Author URI: 			https://developers.paymentsds.org/
- * Version: 				1.0
+ * Version: 				1.0.1
  * Text Domain: 		mpesa-wp-plugin
  * Domain Path: 		/languages
  *
