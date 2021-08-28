@@ -36,6 +36,7 @@ if (!defined('MPESA_WP_PLUGIN_VERSION')) {
 register_activation_hook(__FILE__, 'mpesa_wp_install');
 add_action('plugins_loaded', 'mpesa_wp_update_check');
 add_action('plugins_loaded', 'mpesa_wp_init', 0);
+add_action( 'init', 'wpdocs_load_textdomain' );
 add_filter('woocommerce_payment_gateways', 'mpesa_wp_add_gateway_class');
 
 function mpesa_wp_install() {
@@ -73,18 +74,14 @@ function mpesa_wp_add_gateway_class($gateways) {
 	return $gateways;
 }
 
+function wpdocs_load_textdomain() {
+	load_plugin_textdomain( 'mpesa-wp-plugin', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+}
+
 function mpesa_wp_init() {
-
-
 	if (!class_exists('WC_Payment_Gateway')) {
 		return;
 	}
-
-	load_plugin_textdomain(
-		'mpesa-wp-plugin',
-		false,
-		dirname(plugin_basename(__FILE__) . '/languages')
-	);
 
 	class Mpesa_WP_Plugin extends WC_Payment_Gateway {
 
@@ -169,12 +166,12 @@ function mpesa_wp_init() {
 				'api_key' => array(
 					'title' => __('API Key', 'mpesa-wp-plugin'),
 					'type' => 'password',
-					'default' => __('', 'mpesa-wp-plugin')
+					'default' => ''
 				),
 				'public_key' => array(
 					'title' => __('Public Key', 'mpesa-wp-plugin'),
 					'type' => 'textarea',
-					'default' => __('', 'mpesa-wp-plugin')
+					'default' => ''
 				),
 				'service_provider' => array(
 					'title' => __('Service Provider Code', 'mpesa-wp-plugin'),
@@ -199,17 +196,15 @@ function mpesa_wp_init() {
 			session_start();
 			if ($this->description) {
 				if ('yes' == $this->test) {
-					$this->description .= __(
-						'<br />
-						<strong>TEST MODE ENABLED</strong>',
-						'mpesa-wp-plugin'
-					);
+					$description_translation = __('TEST MODE ENABLED', 'mpesa-wp-plugin');
+					$this->description .= "
+						<br />
+						<strong>$description_translation</strong>
+					";
 				}
+				$text_translation = __('Pay with Mpesa', 'mpesa-wp-plugin');
 
-				$text = __(
-					'<strong>Pay with Mpesa</strong><br/>',
-					'mpesa-wp-plugin'
-				) . $this->description;
+				$text = "<strong>$text_translation</strong><br/>" . $this->description;
 
 				$text = trim($text);
 
@@ -232,7 +227,7 @@ function mpesa_wp_init() {
 			echo '
 				<div class="form-row form-row-wide">
 					<label>'
-				. esc_html__('Mpesa Number', 'mpesa-wp-plugin') .
+				. __('Mpesa Number', 'mpesa-wp-plugin') .
 				'<span class="required"> * </span>
 					</label>
 					<input
@@ -240,9 +235,9 @@ function mpesa_wp_init() {
 						name="wc_mpesa_number"
 						class="wc_mpesa_number"
 						type="tel"
-						value="' . esc_attr($number) . '"
+						value="' . $number . '"
 						autocomplete="off"
-						placeholder="' . esc_attr__('ex: 841234567', 'mpesa-wp-plugin') . '"
+						placeholder="ex: 841234567"
 					>
 				</div>
 				<div class="clear"></div>';
@@ -312,37 +307,34 @@ function mpesa_wp_init() {
 			wp_localize_script('payment', 'payment_text', [
 				'status' => [
 					'intro'  => [
-						'title' => __('Payment Information', 'wc-mpesa-payment-gateway'),
-						'description'  => __(
-							'<p>
-							Thank you for your order, please click the button bellow to proceed.
-							</p>',
-							'wc-mpesa-payment-gateway'
-						),
+						'title' => __('Payment Information', 'mpesa-wp-plugin'),
+						'description'  => "<p>" . __('Thank you for your order, please click the button bellow to proceed.', 'mpesa-wp-plugin') . "</p>"
 					],
 					'requested' => [
-						'title' => __('Payment request sent!', 'wc-mpesa-payment-gateway'),
-						'description' => __(
-							'<p>You will receive a pop-up on the phone requesting payment confirmation, please enter your PIN code to confirm the payment.</p>',
-							'wc-mpesa-payment-gateway'
-						)
+						'title' => __('Payment request sent!', 'mpesa-wp-plugin'),
+						'description' =>
+						'<p>' . __(
+							'You will receive a pop-up on the phone requesting payment confirmation, please enter your PIN code to confirm the payment.',
+							'mpesa-wp-plugin'
+						) .
+							'</p>'
 					],
 					'received' => [
-						'title' => __('Payment received!', 'wc-mpesa-payment-gateway'),
-						'description' => __('Your payment has been received and your order will be processed soon.', 'wc-mpesa-payment-gateway')
+						'title' => __('Payment received!', 'mpesa-wp-plugin'),
+						'description' => __('Your payment has been received and your order will be processed soon.', 'mpesa-wp-plugin')
 					],
 					'timeout' => [
-						'title' => __('Payment timeout exceeded!', 'wc-mpesa-payment-gateway'),
-						'description' => __('Use your browser\'s back button and try again.', 'wc-mpesa-payment-gateway')
+						'title' => __('Payment timeout exceeded!', 'mpesa-wp-plugin'),
+						'description' => __('Use your browser\'s back button and try again.', 'mpesa-wp-plugin')
 					],
 					'failed' => [
-						'title' => __('Payment failed!', 'wc-mpesa-payment-gateway'),
-						'description' => __('Try again or use your browser\'s back button to change the number.', 'wc-mpesa-payment-gateway')
+						'title' => __('Payment failed!', 'mpesa-wp-plugin'),
+						'description' => __('Try again or use your browser\'s back button to change the number.', 'mpesa-wp-plugin')
 					],
 
 				],
 				'buttons' => [
-					'pay' => __('Pay', 'wc-mpesa-payment-gateway'),
+					'pay' => __('Pay', 'mpesa-wp-plugin'),
 				]
 			]);
 			wp_enqueue_style(
@@ -369,12 +361,12 @@ function mpesa_wp_init() {
               <div class='payment-description' role='alert' v-html='status.description'></div>
             </div>
 						<div class='btn-container' >
-            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'wc-mpesa-payment-gateway') . "</button>
+            <button class='payment-btn' v-bind='{ btnDisabled }' v-on:click='pay($data)'>" . __('Pay', 'mpesa-wp-plugin') . "</button>
 						<button
 							class='back-btn'
 							type='button'
 							onClick='history.back();'
-						>". __('Back', 'wc-mpesa-payment-gateway') ."</button>
+						>" . __('Back', 'mpesa-wp-plugin') . "</button>
 						</div>
 						</div>";
 			echo $html_output;
@@ -487,7 +479,7 @@ function mpesa_wp_init() {
 						'failed',
 						__(
 							'Payment failed',
-							'wc-mpesa-payment-gateway'
+							'mpesa-wp-plugin'
 						)
 					);
 				}
