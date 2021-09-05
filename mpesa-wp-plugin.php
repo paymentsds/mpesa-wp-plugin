@@ -30,13 +30,13 @@ use Paymentsds\MPesa\Client;
 use Paymentsds\MPesa\Environment;
 
 if (!defined('MPESA_WP_PLUGIN_VERSION')) {
-	define('MPESA_WP_PLUGIN_VERSION', '1.0');
+	define('MPESA_WP_PLUGIN_VERSION', '1.0.1');
 }
 
 register_activation_hook(__FILE__, 'mpesa_wp_install');
 add_action('plugins_loaded', 'mpesa_wp_update_check');
 add_action('plugins_loaded', 'mpesa_wp_init', 0);
-add_action( 'init', 'wpdocs_load_textdomain' );
+add_action('init', 'wpdocs_load_textdomain');
 add_filter('woocommerce_payment_gateways', 'mpesa_wp_add_gateway_class');
 
 function mpesa_wp_install() {
@@ -75,7 +75,7 @@ function mpesa_wp_add_gateway_class($gateways) {
 }
 
 function wpdocs_load_textdomain() {
-	load_plugin_textdomain( 'mpesa-wp-plugin', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+	load_plugin_textdomain('mpesa-wp-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
 }
 
 function mpesa_wp_init() {
@@ -549,9 +549,7 @@ function mpesa_wp_init() {
 			$client = new Client([
 				'apiKey' => $this->api_key,
 				'publicKey' => $this->public_key,
-				'serviceProviderCode' => $this->service_provider,
-				'debugging' => false,
-				'environment' => 'yes' != $this->test ?? Environment::PRODUCTION
+				'serviceProviderCode' => $this->service_provider
 			]);
 
 			try {
