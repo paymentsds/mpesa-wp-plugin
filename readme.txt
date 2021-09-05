@@ -88,6 +88,10 @@ Se ao fazer o pedido de pagamento, não recebe nenhuma notificação e da timeou
 
 == Changelog ==
 
+= 1.0.1 =
+
+Correções na tradução do plugin.
+
 = 1.0 =
 
 Adicionando suporte à refund. Mudanças no layout da página de pagamento.
