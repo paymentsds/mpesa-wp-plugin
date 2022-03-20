@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  database:
+    container_name: mpesa-wp-db
+    image: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: wpdb
+      MYSQL_USER: wpuser
+      MYSQL_PASSWORD: wppass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+  app:
+    container_name: mpesa-wp-app
+    depends_on:
+      - database
+    build: .
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: database
+      WORDPRESS_DB_USER: wpuser
+      WORDPRESS_DB_PASSWORD: wppass
+      WORDPRESS_DB_NAME: wpdb
+    volumes:
+      - wp_uploads:/var/www/html/wp-content/uploads
+      - wp_themes:/var/www/html/wp-content/themes
+      - ./src:/var/www/html/wp-content/plugins/mpesa-wp-plugin
+
+volumes:
+  db:
+  wp_uploads:
+  wp_themes:
