@@ -39,7 +39,8 @@ add_action('plugins_loaded', 'mpesa_wp_init', 0);
 add_action('init', 'wpdocs_load_textdomain');
 add_filter('woocommerce_payment_gateways', 'mpesa_wp_add_gateway_class');
 
-function mpesa_wp_install() {
+function mpesa_wp_install()
+{
 	global $wpdb;
 	$table_name = $wpdb->prefix . "mpesa_wp_transactions";
 
@@ -63,29 +64,35 @@ function mpesa_wp_install() {
 	dbDelta($sql);
 }
 
-function mpesa_wp_update_check() {
+function mpesa_wp_update_check()
+{
 	if (MPESA_WP_PLUGIN_VERSION != get_option('mpesa_wp_version')) {
 		mpesa_wp_install();
 	}
 }
 
-function mpesa_wp_add_gateway_class($gateways) {
+function mpesa_wp_add_gateway_class($gateways)
+{
 	$gateways[] = 'Mpesa_WP_Plugin';
 	return $gateways;
 }
 
-function wpdocs_load_textdomain() {
+function wpdocs_load_textdomain()
+{
 	load_plugin_textdomain('mpesa-wp-plugin', false, dirname(plugin_basename(__FILE__)) . '/languages');
 }
 
-function mpesa_wp_init() {
+function mpesa_wp_init()
+{
 	if (!class_exists('WC_Payment_Gateway')) {
 		return;
 	}
 
-	class Mpesa_WP_Plugin extends WC_Payment_Gateway {
+	class Mpesa_WP_Plugin extends WC_Payment_Gateway
+	{
 
-		public function __construct() {
+		public function __construct()
+		{
 			$this->id = 'mpesa-wp-plugin';
 			$this->icon = apply_filters(
 				'mpesa_wp_icon',
@@ -142,7 +149,8 @@ function mpesa_wp_init() {
 		/**
 		 * Plugin options
 		 */
-		public function init_form_fields() {
+		public function init_form_fields()
+		{
 			$this->form_fields = array(
 				'enabled' => array(
 					'title'       => __('Enable/Disable', 'mpesa-wp-plugin'),
@@ -192,7 +200,8 @@ function mpesa_wp_init() {
 				*  Payment fields
 			 */
 
-		public function payment_fields() {
+		public function payment_fields()
+		{
 			session_start();
 			if ($this->description) {
 				if ('yes' == $this->test) {
@@ -245,7 +254,8 @@ function mpesa_wp_init() {
 			echo '<div class="clear"></div></fieldset>';
 		}
 
-		public function validate_fields() {
+		public function validate_fields()
+		{
 			session_start();
 			//validate currency
 			if ('MZN' != get_woocommerce_currency()) {
@@ -272,7 +282,8 @@ function mpesa_wp_init() {
 			return true;
 		}
 
-		public function wc_mpesa_validate_number($number) {
+		public function wc_mpesa_validate_number($number)
+		{
 			$number = filter_var($number, FILTER_VALIDATE_INT);
 			//validade mpesa numbers to only accept 84 and 85 prefix ex: 84 8283607
 			if (
@@ -287,7 +298,8 @@ function mpesa_wp_init() {
 			return $number;
 		}
 
-		function payment_scripts() {
+		function payment_scripts()
+		{
 			if (!is_checkout_pay_page()) {
 				return;
 			}
@@ -346,7 +358,8 @@ function mpesa_wp_init() {
 			);
 		}
 
-		function payment_form_html($order_id) {
+		function payment_form_html($order_id)
+		{
 			// modify post object here
 			$order = new WC_Order($order_id);
 			$return_url = $this->get_return_url($order);
@@ -375,7 +388,8 @@ function mpesa_wp_init() {
 		/*
 			 * We're processing the payments here
 			 */
-		public function process_payment($order_id) {
+		public function process_payment($order_id)
+		{
 			session_start();
 			$order = new WC_Order($order_id);
 			$checkout_url = $order->get_checkout_payment_url(true);
@@ -386,7 +400,8 @@ function mpesa_wp_init() {
 			);
 		}
 
-		function process_action() {
+		function process_action()
+		{
 			session_start();
 
 			if (isset($_SESSION['wc_mpesa_number'])) {
@@ -488,12 +503,14 @@ function mpesa_wp_init() {
 			wp_send_json($response);
 		}
 
-		function generate_reference_id($order_id) {
+		function generate_reference_id($order_id)
+		{
 			//generate uniq reference_id
 			return substr($order_id . bin2hex(random_bytes(5)), 0, 10);
 		}
 
-		function wc_minimum_order_amount() {
+		function wc_minimum_order_amount()
+		{
 			// Set this variable to specify a minimum order value
 			$minimum = 1;
 
@@ -524,7 +541,8 @@ function mpesa_wp_init() {
 		}
 
 		// Processing refunds
-		public function process_refund($order_id, $amount = null, $reason = "") {
+		public function process_refund($order_id, $amount = null, $reason = "")
+		{
 			$order = wc_get_order($order_id);
 
 			if (!is_a($order, 'WC_Order')) {
