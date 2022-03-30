@@ -4,7 +4,7 @@ Author URI: https://developers.paymentsds.org/
 Plugin URL: https://wordpress.org/plugins/wc-paymentsds-mpesa/
 Tags:  mpesa, m-pesa, woocommerce, mpesa api, gateway, Mobile Payments, mpesa online, Vodacom, Mpesa API Mozambique, Payments, PaymentsDS, Woocommerce payment gateway
 Requires at least: 5.0
-Tested up to: 5.8
+Tested up to: 5.9
 Requires PHP: 7.0
 Stable tag: 1.0.1
 License: GPLv3 or later
